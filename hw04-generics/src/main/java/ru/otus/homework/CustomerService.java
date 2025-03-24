@@ -11,15 +11,22 @@ public class CustomerService {
 
     public Map.Entry<Customer, String> getSmallest() {
         Map.Entry<Customer, String> smallest = customerMap.firstEntry();
+        if (smallest == null) {
+            return null;
+        }
         Customer key = smallest.getKey();
         Customer copy = new Customer(key.getId(), key.getName(), key.getScores());
         return Map.entry(copy, smallest.getValue());
     }
 
     public Map.Entry<Customer, String> getNext(Customer customer) {
-        TreeMap<Customer, String> customerStringTreeMap = new TreeMap<>(Comparator.comparing(Customer::getScores));
-        customerStringTreeMap.putAll(customerMap);
-        return customerStringTreeMap.higherEntry(customer);
+        Map.Entry<Customer, String> highered = customerMap.higherEntry(customer);
+        if (highered == null) {
+            return null;
+        }
+        Customer key = highered.getKey();
+        Customer copy = new Customer(key.getId(), key.getName(), key.getScores());
+        return Map.entry(copy, highered.getValue());
     }
 
     public void add(Customer customer, String data) {
