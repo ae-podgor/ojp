@@ -15,6 +15,7 @@ public class TestingClass {
     @After
     public static void finishTest() {
         System.out.println("I am After test");
+//        throw new RuntimeException();
     }
 
     @Test
