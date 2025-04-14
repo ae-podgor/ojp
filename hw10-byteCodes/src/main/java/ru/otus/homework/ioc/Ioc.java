@@ -2,8 +2,6 @@ package ru.otus.homework.ioc;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import ru.otus.homework.TestLogging;
-import ru.otus.homework.TestLoggingInterface;
 import ru.otus.homework.annotation.Log;
 
 import java.lang.reflect.InvocationHandler;
@@ -19,18 +17,18 @@ public class Ioc {
     private Ioc() {
     }
 
-    public static TestLoggingInterface createMyClass() {
-        InvocationHandler handler = new DemoInvocationHandler(new TestLogging());
-        return (TestLoggingInterface)
-                Proxy.newProxyInstance(Ioc.class.getClassLoader(), new Class<?>[]{TestLoggingInterface.class}, handler);
+    @SuppressWarnings("unchecked")
+    public static <T> T createProxy(Class<T> interfaceClass, T impl) {
+        InvocationHandler handler = new DemoInvocationHandler<>(impl);
+        return (T) Proxy.newProxyInstance(Ioc.class.getClassLoader(), new Class<?>[]{interfaceClass}, handler);
     }
 
-    static class DemoInvocationHandler implements InvocationHandler {
-        private final TestLoggingInterface myClass;
+    static class DemoInvocationHandler<T> implements InvocationHandler {
+        private final T target;
         private final Map<Method, Boolean> logAnnotationCache = new HashMap<>();
 
-        public DemoInvocationHandler(TestLoggingInterface myClass) {
-            this.myClass = myClass;
+        public DemoInvocationHandler(T target) {
+            this.target = target;
         }
 
         @Override
@@ -43,12 +41,12 @@ public class Ioc {
                 String params = args != null ? Arrays.toString(args) : "none";
                 logger.info("invoking method: {}, params: {}", method.getName(), params);
             }
-            return method.invoke(myClass, args);
+            return method.invoke(target, args);
         }
 
         private boolean checkIfLogAnnotationPresent(Method interfaceMethod) {
             try {
-                Method implementationMethod = myClass.getClass()
+                Method implementationMethod = target.getClass()
                         .getMethod(interfaceMethod.getName(), interfaceMethod.getParameterTypes());
                 return implementationMethod.isAnnotationPresent(Log.class);
             } catch (NoSuchMethodException e) {
@@ -58,7 +56,7 @@ public class Ioc {
 
         @Override
         public String toString() {
-            return "DemoInvocationHandler{" + "myClass=" + myClass + '}';
+            return "DemoInvocationHandler{" + "target=" + target + '}';
         }
     }
 }
