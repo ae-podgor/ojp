@@ -18,7 +18,7 @@ public class Ioc {
     }
 
     @SuppressWarnings("unchecked")
-    public static <T> T createProxy(Class<T> interfaceClass, T impl) {
+    public static <T> T createMyClass(Class<T> interfaceClass, T impl) {
         InvocationHandler handler = new DemoInvocationHandler<>(impl);
         return (T) Proxy.newProxyInstance(Ioc.class.getClassLoader(), new Class<?>[]{interfaceClass}, handler);
     }
