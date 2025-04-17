@@ -4,6 +4,7 @@ include("hw04-generics")
 include("hw06-annotations")
 include("hw07-gc")
 include("hw10-byteCodes")
+include("hw12-solid")
 pluginManagement {
     val dependencyManagement: String by settings
     val johnrengelmanShadow: String by settings
