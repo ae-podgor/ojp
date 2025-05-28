@@ -6,6 +6,7 @@ include("hw07-gc")
 include("hw10-byteCodes")
 include("hw12-solid")
 include("hw15-patterns")
+include("hw16-io")
 pluginManagement {
     val dependencyManagement: String by settings
     val johnrengelmanShadow: String by settings
