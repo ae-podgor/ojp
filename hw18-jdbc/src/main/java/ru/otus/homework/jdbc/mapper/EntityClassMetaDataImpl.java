@@ -9,19 +9,56 @@ import java.util.List;
 
 public class EntityClassMetaDataImpl<T> implements EntityClassMetaData<T> {
 
-    private final Class<T> entityClass;
+    private final String name;
+    private final Constructor<T> constructor;
+    private final List<Field> allFields;
+    private final List<Field> noIdFields;
+    private final Field idField;
 
     public EntityClassMetaDataImpl(Class<T> entityClass) {
-        this.entityClass = entityClass;
+        this.name = entityClass.getSimpleName();
+        this.constructor = initConstructor(entityClass);
+        this.allFields = List.of(entityClass.getDeclaredFields());
+        this.noIdFields = initNoIdFields(entityClass);
+        this.idField = initIdField(entityClass);
     }
 
     @Override
     public String getName() {
-        return entityClass.getSimpleName();
+        return name;
     }
 
     @Override
     public Constructor<T> getConstructor() {
+        return constructor;
+    }
+
+    @Override
+    public Field getIdField() {
+        return idField;
+    }
+
+    @Override
+    public List<Field> getAllFields() {
+        return allFields;
+    }
+
+    @Override
+    public List<Field> getFieldsWithoutId() {
+        return noIdFields;
+    }
+
+    private List<Field> initNoIdFields(Class<T> entityClass) {
+        List<Field> fields = new ArrayList<>();
+        for (Field field : entityClass.getDeclaredFields()) {
+            if (!field.isAnnotationPresent(Id.class)) {
+                fields.add(field);
+            }
+        }
+        return fields;
+    }
+
+    private Constructor<T> initConstructor(Class<T> entityClass) {
         try {
             return entityClass.getDeclaredConstructor();
         } catch (NoSuchMethodException e) {
@@ -29,29 +66,12 @@ public class EntityClassMetaDataImpl<T> implements EntityClassMetaData<T> {
         }
     }
 
-    @Override
-    public Field getIdField() {
+    private Field initIdField(Class<T> entityClass) {
         for (Field field : entityClass.getDeclaredFields()) {
             if (field.isAnnotationPresent(Id.class)) {
                 return field;
             }
         }
         throw new RuntimeException("Field with @Id annotation not found");
-    }
-
-    @Override
-    public List<Field> getAllFields() {
-        return List.of(entityClass.getDeclaredFields());
-    }
-
-    @Override
-    public List<Field> getFieldsWithoutId() {
-        ArrayList<Field> fields = new ArrayList<>();
-        for (Field field : entityClass.getDeclaredFields()) {
-            if (!field.isAnnotationPresent(Id.class)) {
-                fields.add(field);
-            }
-        }
-        return fields;
     }
 }
