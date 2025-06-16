@@ -65,11 +65,20 @@ public class EntitySQLMetaDataImpl<T> implements EntitySQLMetaData {
     }
 
     private String initSelectById(EntityClassMetaData<T> entityClassMetaData) {
-        return "select * from %s where %s = ?"
-                .formatted(entityClassMetaData.getName().toLowerCase(), entityClassMetaData.getIdField().getName());
+        String fieldNames = entityClassMetaData.getAllFields().stream()
+                .map(Field::getName)
+                .collect(Collectors.joining(", "));
+
+        return "select %s from %s where %s = ?"
+                .formatted(fieldNames, entityClassMetaData.getName().toLowerCase(),
+                        entityClassMetaData.getIdField().getName());
     }
 
     private String initSelectAll(EntityClassMetaData<T> entityClassMetaData) {
-        return "select * from %s".formatted(entityClassMetaData.getName().toLowerCase());
+        String fieldNames = entityClassMetaData.getAllFields().stream()
+                .map(Field::getName)
+                .collect(Collectors.joining(", "));
+
+        return "select %s from %s".formatted(fieldNames, entityClassMetaData.getName().toLowerCase());
     }
 }
