@@ -7,6 +7,7 @@ import ru.otus.homework.core.repository.executor.DbExecutor;
 
 import java.lang.reflect.Field;
 import java.sql.Connection;
+import java.sql.ResultSet;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -34,14 +35,7 @@ public class DataTemplateJdbc<T> implements DataTemplate<T> {
         return dbExecutor.executeSelect(connection, selectByIdSql, List.of(id), rs -> {
             try {
                 if (rs.next()) {
-                    T instance = entityClassMetaData.getConstructor().newInstance();
-                    for (Field field : entityClassMetaData.getAllFields()) {
-                        field.setAccessible(true);
-                        String columnName = field.getName();
-                        Object value = rs.getObject(columnName);
-                        field.set(instance, value);
-                    }
-                    return instance;
+                    return getInstance(rs);
                 }
                 return null;
             } catch (Exception e) {
@@ -57,13 +51,7 @@ public class DataTemplateJdbc<T> implements DataTemplate<T> {
                     try {
                         var list = new ArrayList<T>();
                         while (rs.next()) {
-                            T instance = entityClassMetaData.getConstructor().newInstance();
-                            for (Field field : entityClassMetaData.getAllFields()) {
-                                field.setAccessible(true);
-                                String columnName = field.getName();
-                                Object value = rs.getObject(columnName);
-                                field.set(instance, value);
-                            }
+                            T instance = getInstance(rs);
                             list.add(instance);
                         }
                         return list;
@@ -78,12 +66,7 @@ public class DataTemplateJdbc<T> implements DataTemplate<T> {
     public long insert(Connection connection, T object) {
         String insertSql = entitySQLMetaData.getInsertSql();
         try {
-            List<Object> params = new ArrayList<>();
-            for (Field field : entityClassMetaData.getFieldsWithoutId()) {
-                field.setAccessible(true);
-                Object value = field.get(object);
-                params.add(value);
-            }
+            List<Object> params = getParams(object);
             return dbExecutor.executeStatement(connection, insertSql, params);
         } catch (Exception e) {
             throw new DataTemplateException(e);
@@ -94,15 +77,31 @@ public class DataTemplateJdbc<T> implements DataTemplate<T> {
     public void update(Connection connection, T object) {
         String updateSql = entitySQLMetaData.getUpdateSql();
         try {
-            List<Object> params = new ArrayList<>();
-            for (Field field : entityClassMetaData.getFieldsWithoutId()) {
-                field.setAccessible(true);
-                Object value = field.get(object);
-                params.add(value);
-            }
+            List<Object> params = getParams(object);
             dbExecutor.executeStatement(connection, updateSql, List.of(params, entityClassMetaData.getIdField()));
         } catch (Exception e) {
             throw new DataTemplateException(e);
         }
+    }
+
+    private List<Object> getParams(T object) throws IllegalAccessException {
+        List<Object> params = new ArrayList<>();
+        for (Field field : entityClassMetaData.getFieldsWithoutId()) {
+            field.setAccessible(true);
+            Object value = field.get(object);
+            params.add(value);
+        }
+        return params;
+    }
+
+    private T getInstance(ResultSet rs) throws Exception {
+        T instance = entityClassMetaData.getConstructor().newInstance();
+        for (Field field : entityClassMetaData.getAllFields()) {
+            field.setAccessible(true);
+            String columnName = field.getName();
+            Object value = rs.getObject(columnName);
+            field.set(instance, value);
+        }
+        return instance;
     }
 }
