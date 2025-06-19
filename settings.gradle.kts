@@ -7,6 +7,9 @@ include("hw10-byteCodes")
 include("hw12-solid")
 include("hw15-patterns")
 include("hw16-io")
+include("hw18-jdbc")
+include("hw18-jdbc:demo")
+
 pluginManagement {
     val dependencyManagement: String by settings
     val johnrengelmanShadow: String by settings
