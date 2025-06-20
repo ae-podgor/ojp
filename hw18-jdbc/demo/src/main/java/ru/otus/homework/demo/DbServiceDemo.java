@@ -1,4 +1,4 @@
-package ru.otus.homework.homework.demo;
+package ru.otus.homework.demo;
 
 import org.flywaydb.core.Flyway;
 import org.slf4j.Logger;
