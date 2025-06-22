@@ -1,6 +1,6 @@
 package ru.otus.homework.crm.model;
 
-import lombok.AllArgsConstructor;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -12,7 +12,6 @@ import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.SequenceGenerator;
@@ -24,7 +23,6 @@ import java.util.stream.Collectors;
 @Getter
 @Setter
 @NoArgsConstructor
-@AllArgsConstructor
 @Entity
 @Table(name = "client")
 public class Client implements Cloneable {
@@ -33,6 +31,7 @@ public class Client implements Cloneable {
     @SequenceGenerator(name = "client_gen", sequenceName = "client_seq", initialValue = 1, allocationSize = 1)
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "client_gen")
     @Column(name = "id")
+    @EqualsAndHashCode.Include
     private Long id;
 
     @Column(name = "name")
@@ -41,8 +40,7 @@ public class Client implements Cloneable {
     @OneToOne(cascade = CascadeType.ALL, orphanRemoval = true)
     private Address address;
 
-    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
-    @JoinColumn(name = "client_id")
+    @OneToMany(mappedBy = "client", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
     private List<Phone> phones;
 
     public Client(String name) {
@@ -55,18 +53,35 @@ public class Client implements Cloneable {
         this.name = name;
     }
 
+    public Client(Long id, String name, Address clonedAddress) {
+        this.id = id;
+        this.name = name;
+        this.address = clonedAddress;
+    }
+
+    public Client(Long id, String name, Address clonedAddress, List<Phone> phones) {
+        this.id = id;
+        this.name = name;
+        this.address = clonedAddress;
+        this.phones = phones;
+        phones.forEach(p -> p.setClient(this));
+    }
+
     @Override
     @SuppressWarnings({"java:S2975", "java:S1182"})
     public Client clone() {
         Address origAddress = this.address;
         Address clonedAddress = origAddress != null ? new Address(origAddress.getId(), origAddress.getStreet()) : null;
 
-        List<Phone> clonedPhones = this.phones != null ? this.phones.stream()
-                .map(phone -> new Phone(phone.getId(), phone.getNumber()))
+        Client newClient = new Client(this.id, this.name, clonedAddress);
+        List<Phone> phoneList = this.phones != null ? this.phones.stream()
+                .map(phone -> new Phone(phone.getId(), phone.getNumber(), newClient))
                 .collect(Collectors.toList())
                 : new ArrayList<>();
 
-        return new Client(this.id, this.name, clonedAddress, clonedPhones);
+        newClient.setPhones(phoneList);
+
+        return newClient;
     }
 
     @Override
