@@ -1,10 +1,9 @@
 package ru.otus.homework.core.sessionmanager;
 
 import org.hibernate.SessionFactory;
+import org.hibernate.cfg.Configuration;
 import ru.otus.homework.core.repository.HibernateUtils;
 import ru.otus.homework.crm.dbmigrations.MigrationsExecutorFlyway;
-
-import org.hibernate.cfg.Configuration;
 import ru.otus.homework.crm.model.Address;
 import ru.otus.homework.crm.model.Client;
 import ru.otus.homework.crm.model.Phone;

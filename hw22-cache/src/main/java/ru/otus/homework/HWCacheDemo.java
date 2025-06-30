@@ -38,15 +38,12 @@ public class HWCacheDemo {
         for (int i = 0; i < 5000; i++) {
             dbServiceClient.saveClient(new Client("client" + (i + 1)));
         }
-//        logger.info("Cache size {}", cache.getSize());
 
         for (int i = 0; i < 5000; i++) {
             dbServiceClient.getClient(i + 1);
         }
         LocalDateTime end = LocalDateTime.now();
         logger.info("Finished HW Cache Demo at {}", end);
-//        System.gc();
-//        logger.info("Cache size {}", cache.getSize());
         logger.info("Total time: {} ms", Duration.between(start, end).toMillis());
 //      Total time: 14383 ms
 //      Total time without cache: 21371 ms

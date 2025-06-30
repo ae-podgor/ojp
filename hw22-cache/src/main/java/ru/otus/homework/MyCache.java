@@ -1,11 +1,16 @@
 package ru.otus.homework;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.WeakHashMap;
 
 public class MyCache<K, V> implements HwCache<K, V> {
+
+    private static final Logger logger = LoggerFactory.getLogger(MyCache.class);
 
     private final Map<K, V> map = new WeakHashMap<>();
     private final Set<HwListener<K, V>> listeners = new HashSet<>();
@@ -41,14 +46,15 @@ public class MyCache<K, V> implements HwCache<K, V> {
         listeners.remove(listener);
     }
 
-//    public int getSize() {
-//        return map.size();
-//    }
-
     private void notifyListeners(String action, K key, V value) {
         if (listeners.isEmpty()) return;
         for (HwListener<K, V> listener : listeners) {
-            listener.notify(key, value, action);
+            try {
+                listener.notify(key, value, action);
+            } catch (Exception e) {
+                logger.error("Error notifying listener: {}", e.getMessage());
+                throw new RuntimeException("Error notifying listener: " + e.getMessage(), e);
+            }
         }
     }
 }

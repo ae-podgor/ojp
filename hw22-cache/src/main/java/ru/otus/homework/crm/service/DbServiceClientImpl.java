@@ -32,19 +32,19 @@ public class DbServiceClientImpl implements DBServiceClient {
             if (client.getId() == null) {
                 var savedClient = clientDataTemplate.insert(session, clientCloned);
                 log.info("created client: {}", clientCloned);
-                cache.put(String.valueOf(savedClient.getId()), savedClient);
+                cache.put(getCacheKey(savedClient.getId()), savedClient);
                 return savedClient;
             }
             var savedClient = clientDataTemplate.update(session, clientCloned);
             log.info("updated client: {}", savedClient);
-            cache.put(String.valueOf(savedClient.getId()), savedClient);
+            cache.put(getCacheKey(savedClient.getId()), savedClient);
             return savedClient;
         });
     }
 
     @Override
     public Optional<Client> getClient(long id) {
-        Client client = cache.get(String.valueOf(id));
+        Client client = cache.get(getCacheKey(id));
         if (client != null) {
             log.info("found client in cache: {}", client);
             return Optional.of(client);
@@ -52,7 +52,7 @@ public class DbServiceClientImpl implements DBServiceClient {
         return transactionManager.doInReadOnlyTransaction(session -> {
             var clientOptional = clientDataTemplate.findById(session, id);
             log.info("client: {}", clientOptional);
-            clientOptional.ifPresent(value -> cache.put(String.valueOf(id), value));
+            clientOptional.ifPresent(value -> cache.put(getCacheKey(id), value));
             return clientOptional;
         });
     }
@@ -64,5 +64,9 @@ public class DbServiceClientImpl implements DBServiceClient {
             log.info("clientList:{}", clientList);
             return clientList;
         });
+    }
+
+    private String getCacheKey(long clientId) {
+        return String.valueOf(clientId);
     }
 }
