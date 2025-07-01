@@ -1,0 +1,57 @@
+﻿<!DOCTYPE html>
+<html lang="ru" xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="UTF-8">
+    <title>Клиенты</title>
+    <script>
+        function getAllClients() {
+            const clientsDataContainer = document.getElementById('clientsDataContainer');
+            fetch('/api/clients')
+                .then(response => response.json())
+                .then(clients => clientsDataContainer.innerHTML = JSON.stringify(clients, null, 2))
+                .catch(error => clientsDataContainer.innerHTML = 'Ошибка при получении данных: ' + error);
+        }
+        function createClient() {
+            const clientNameTextBox = document.getElementById('clientNameTextBox');
+            const clientAddressTextBox = document.getElementById('clientAddressTextBox');
+            const clientPhonesTextBox = document.getElementById('clientPhonesTextBox');
+            const clientCreatedContainer = document.getElementById('clientCreatedContainer');
+
+            const clientName = clientNameTextBox.value;
+            const clientAddress = clientAddressTextBox.value;
+            const clientPhones = clientPhonesTextBox.value.split(',');
+
+            fetch('/api/clients', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    name: clientName,
+                    address: clientAddress,
+                    phones: clientPhones
+                }),
+            })
+                .then(response => response.json())
+                .then(client => {
+                    clientCreatedContainer.innerHTML = 'Создан клиент: ' + JSON.stringify(client);
+                })
+                .catch(() => clientCreatedContainer.innerHTML = 'Ошибка при создании клиента');
+        }
+    </script>
+</head>
+
+<body>
+<h4>Создать нового клиента</h4>
+<input type="text" id="clientNameTextBox" placeholder="Имя"><br>
+<input type="text" id="clientAddressTextBox" placeholder="Адрес"><br>
+<input type="text" id="clientPhonesTextBox" placeholder="Номера телефона клиента"><br>
+<small>Формат: +79991234567,+79991234568 (используйте запятую для разделения)</small><br>
+<button onclick="createClient()">Создать</button>
+<pre id="clientCreatedContainer"></pre>
+
+<h4>Получить список всех клиентов</h4>
+<button onclick="getAllClients()">Получить список клиентов</button>
+<pre id="clientsDataContainer"></pre>
+</body>
+</html>
