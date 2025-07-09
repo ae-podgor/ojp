@@ -1,6 +1,7 @@
 package ru.otus.homework.appcontainer;
 
-
+import org.reflections.Reflections;
+import org.reflections.scanners.Scanners;
 import ru.otus.homework.appcontainer.api.AppComponent;
 import ru.otus.homework.appcontainer.api.AppComponentsContainer;
 import ru.otus.homework.appcontainer.api.AppComponentsContainerConfig;
@@ -12,6 +13,7 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 @SuppressWarnings("squid:S1068")
 public class AppComponentsContainerImpl implements AppComponentsContainer {
@@ -20,11 +22,38 @@ public class AppComponentsContainerImpl implements AppComponentsContainer {
     private final Map<String, Object> appComponentsByName = new HashMap<>();
 
     public AppComponentsContainerImpl(Class<?> initialConfigClass) {
+        checkConfigClass(initialConfigClass);
         processConfig(initialConfigClass);
     }
 
+    public AppComponentsContainerImpl(Class<?>... initialConfigClass) {
+        Arrays.stream(initialConfigClass).forEach(this::checkConfigClass);
+        getOrder(initialConfigClass);
+        Arrays.stream(initialConfigClass).forEach(this::processConfig);
+    }
+
+    public AppComponentsContainerImpl(String packageName) {
+        Class<?>[] configArray = getConfigClasses(packageName);
+        getOrder(configArray);
+        Arrays.stream(configArray).forEach(this::processConfig);
+    }
+
+    private Class<?>[] getConfigClasses(String packageName) {
+        Reflections reflections = new Reflections(packageName, Scanners.TypesAnnotated);
+        Set<Class<?>> configClasses = reflections.getTypesAnnotatedWith(AppComponentsContainerConfig.class);
+        if (configClasses.isEmpty()) {
+            throw new IllegalArgumentException(
+                    "В пакете '%s' нет классов с аннотацией @AppComponentsContainerConfig".formatted(packageName));
+        }
+        return configClasses.toArray(new Class<?>[0]);
+    }
+
+    private void getOrder(Class<?>... configClasses) {
+        Arrays.sort(configClasses, Comparator.comparingInt(value ->
+                value.getAnnotation(AppComponentsContainerConfig.class).order()));
+    }
+
     private void processConfig(Class<?> configClass) {
-        checkConfigClass(configClass);
         Method[] methods = configClass.getDeclaredMethods();
         Arrays.sort(methods, Comparator.comparingInt(m -> m.getAnnotation(AppComponent.class).order()));
 
@@ -55,7 +84,8 @@ public class AppComponentsContainerImpl implements AppComponentsContainer {
 
     private void checkConfigClass(Class<?> configClass) {
         if (!configClass.isAnnotationPresent(AppComponentsContainerConfig.class)) {
-            throw new IllegalArgumentException(String.format("Given class is not config %s", configClass.getName()));
+            throw new IllegalArgumentException(String.format(
+                    "Переданный класс не является конфигурацией '%s'", configClass.getName()));
         }
     }
 
@@ -66,9 +96,11 @@ public class AppComponentsContainerImpl implements AppComponentsContainer {
                 .map(componentClass::cast)
                 .toList();
         if (collected.isEmpty()) {
-            throw new RuntimeException("Компонент с именем '%s' не найден.".formatted(componentClass.getName()));
+            throw new IllegalArgumentException(
+                    "Компонент с именем '%s' не найден.".formatted(componentClass.getName()));
         } else if (collected.size() > 1) {
-            throw new RuntimeException("Компонентов с именем '%s' больше одного.".formatted(componentClass.getName()));
+            throw new IllegalArgumentException(
+                    "Компонентов с именем '%s' больше одного.".formatted(componentClass.getName()));
         }
         return collected.getFirst();
     }

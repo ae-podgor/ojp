@@ -17,7 +17,10 @@ PS Приложение представляет собой тренажер т�
 
 import ru.otus.homework.appcontainer.AppComponentsContainerImpl;
 import ru.otus.homework.appcontainer.api.AppComponentsContainer;
-import ru.otus.homework.config.AppConfig;
+import ru.otus.homework.config.EquationPreparerConfig;
+import ru.otus.homework.config.GameProcessorConfig;
+import ru.otus.homework.config.IOServiceConfig;
+import ru.otus.homework.config.PlayerServiceConfig;
 import ru.otus.homework.services.GameProcessor;
 import ru.otus.homework.services.GameProcessorImpl;
 
@@ -29,15 +32,17 @@ public class App {
         // AppComponentsContainer container = new AppComponentsContainerImpl(AppConfig1.class, AppConfig2.class);
 
         // Тут можно использовать библиотеку Reflections (см. зависимости)
-        // AppComponentsContainer container = new AppComponentsContainerImpl("ru.otus.config");
+         AppComponentsContainer container = new AppComponentsContainerImpl("ru.otus.homework.config");
 
         // Обязательный вариант
-        AppComponentsContainer container = new AppComponentsContainerImpl(AppConfig.class);
+//        AppComponentsContainer container = new AppComponentsContainerImpl(AppConfig.class);
+//        AppComponentsContainer container = new AppComponentsContainerImpl(
+//                EquationPreparerConfig.class, GameProcessorConfig.class, IOServiceConfig.class, PlayerServiceConfig.class);
 
         // Приложение должно работать в каждом из указанных ниже вариантов
 //        GameProcessor gameProcessor = container.getAppComponent(GameProcessor.class);
-//         GameProcessor gameProcessor = container.getAppComponent(GameProcessorImpl.class);
-         GameProcessor gameProcessor = container.getAppComponent("gameProcessor");
+         GameProcessor gameProcessor = container.getAppComponent(GameProcessorImpl.class);
+//         GameProcessor gameProcessor = container.getAppComponent("gameProcessor");
 
         gameProcessor.startGame();
     }

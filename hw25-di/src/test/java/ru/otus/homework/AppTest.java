@@ -8,6 +8,10 @@ import ru.otus.homework.appcontainer.AppComponentsContainerImpl;
 import ru.otus.homework.appcontainer.api.AppComponent;
 import ru.otus.homework.appcontainer.api.AppComponentsContainerConfig;
 import ru.otus.homework.config.AppConfig;
+import ru.otus.homework.config.EquationPreparerConfig;
+import ru.otus.homework.config.GameProcessorConfig;
+import ru.otus.homework.config.IOServiceConfig;
+import ru.otus.homework.config.PlayerServiceConfig;
 import ru.otus.homework.services.EquationPreparer;
 import ru.otus.homework.services.EquationPreparerImpl;
 import ru.otus.homework.services.IOService;
@@ -43,7 +47,7 @@ class AppTest {
             })
     void shouldExtractFromContextCorrectComponentWithNotNullFields(String classNameOrBeanId, Class<?> rootClass)
             throws Exception {
-        var ctx = new AppComponentsContainerImpl(AppConfig.class);
+        var ctx = new AppComponentsContainerImpl(EquationPreparerConfig.class, GameProcessorConfig.class, IOServiceConfig.class, PlayerServiceConfig.class);
 
         assertThat(classNameOrBeanId).isNotEmpty();
         Object component;
