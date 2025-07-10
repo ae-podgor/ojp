@@ -28,14 +28,41 @@ public class AppComponentsContainerImpl implements AppComponentsContainer {
 
     public AppComponentsContainerImpl(Class<?>... initialConfigClass) {
         Arrays.stream(initialConfigClass).forEach(this::checkConfigClass);
-        getOrder(initialConfigClass);
+        sortConfigClasses(initialConfigClass);
         Arrays.stream(initialConfigClass).forEach(this::processConfig);
     }
 
     public AppComponentsContainerImpl(String packageName) {
         Class<?>[] configArray = getConfigClasses(packageName);
-        getOrder(configArray);
+        sortConfigClasses(configArray);
         Arrays.stream(configArray).forEach(this::processConfig);
+    }
+
+    @Override
+    public <C> C getAppComponent(Class<C> componentClass) {
+        List<C> collected = appComponents.stream()
+                .filter(componentClass::isInstance)
+                .map(componentClass::cast)
+                .toList();
+        if (collected.isEmpty()) {
+            throw new IllegalArgumentException(
+                    "Компонент с именем '%s' не найден.".formatted(componentClass.getName()));
+        } else if (collected.size() > 1) {
+            throw new IllegalArgumentException(
+                    "Компонентов с именем '%s' больше одного.".formatted(componentClass.getName()));
+        }
+        return collected.getFirst();
+    }
+
+    @SuppressWarnings("unchecked")
+    @Override
+    public <C> C getAppComponent(String componentName) {
+        Object component = appComponentsByName.get(componentName);
+
+        if (component == null) {
+            throw new IllegalArgumentException("Компонент с именем '%s' не найден.".formatted(componentName));
+        }
+        return (C) component;
     }
 
     private Class<?>[] getConfigClasses(String packageName) {
@@ -48,7 +75,7 @@ public class AppComponentsContainerImpl implements AppComponentsContainer {
         return configClasses.toArray(new Class<?>[0]);
     }
 
-    private void getOrder(Class<?>... configClasses) {
+    private void sortConfigClasses(Class<?>... configClasses) {
         Arrays.sort(configClasses, Comparator.comparingInt(value ->
                 value.getAnnotation(AppComponentsContainerConfig.class).order()));
     }
@@ -87,32 +114,5 @@ public class AppComponentsContainerImpl implements AppComponentsContainer {
             throw new IllegalArgumentException(String.format(
                     "Переданный класс не является конфигурацией '%s'", configClass.getName()));
         }
-    }
-
-    @Override
-    public <C> C getAppComponent(Class<C> componentClass) {
-        List<C> collected = appComponents.stream()
-                .filter(componentClass::isInstance)
-                .map(componentClass::cast)
-                .toList();
-        if (collected.isEmpty()) {
-            throw new IllegalArgumentException(
-                    "Компонент с именем '%s' не найден.".formatted(componentClass.getName()));
-        } else if (collected.size() > 1) {
-            throw new IllegalArgumentException(
-                    "Компонентов с именем '%s' больше одного.".formatted(componentClass.getName()));
-        }
-        return collected.getFirst();
-    }
-
-    @SuppressWarnings("unchecked")
-    @Override
-    public <C> C getAppComponent(String componentName) {
-        Object component = appComponentsByName.get(componentName);
-
-        if (component == null) {
-            throw new IllegalArgumentException("Компонент с именем '%s' не найден.".formatted(componentName));
-        }
-        return (C) component;
     }
 }
