@@ -2,6 +2,7 @@ package ru.otus.homework;
 
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
@@ -17,6 +18,7 @@ import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.util.Properties;
 
+@Disabled("Включать с запущенным докером")
 @DisplayName("Сравниваем скорость работы с connectionPool и без него ")
 @Testcontainers
 @SuppressWarnings("java:S2699")

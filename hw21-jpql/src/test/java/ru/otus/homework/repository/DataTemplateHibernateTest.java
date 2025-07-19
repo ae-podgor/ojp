@@ -1,5 +1,6 @@
 package ru.otus.homework.repository;
 
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import ru.otus.homework.base.AbstractHibernateTest;
@@ -13,6 +14,7 @@ import java.util.Optional;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @SuppressWarnings("java:S125")
+@Disabled("Включать с запущенным докером")
 class DataTemplateHibernateTest extends AbstractHibernateTest {
 
     @Test
