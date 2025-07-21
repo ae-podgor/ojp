@@ -8,6 +8,7 @@ import ru.otus.homework.crm.model.Phone;
 import ru.otus.homework.crm.repository.AddressRepository;
 import ru.otus.homework.crm.repository.ClientRepository;
 import ru.otus.homework.crm.repository.PhoneRepository;
+import ru.otus.homework.dto.ClientCreateDto;
 import ru.otus.homework.sessionmanager.TransactionManager;
 
 import java.util.Arrays;
@@ -28,14 +29,14 @@ public class DbServiceClientImpl implements DBServiceClient {
     }
 
     @Override
-    public Client createClient(String name, String street, String phones) {
+    public Client createClient(ClientCreateDto clientDto) {
         return transactionManager.doInTransaction(() -> {
-            Client client = new Client(null, name, null, List.of(), true);
+            Client client = new Client(null, clientDto.name(), null, List.of(), true);
             Client savedClient = clientRepository.save(client);
 
-            Address address = addressRepository.save(new Address(null, street, savedClient.getId()));
+            Address address = addressRepository.save(new Address(null, clientDto.street(), savedClient.getId()));
 
-            List<Phone> phoneNumbers = Arrays.stream(phones.split(","))
+            List<Phone> phoneNumbers = Arrays.stream(clientDto.phones().split(","))
                     .map(String::trim)
                     .filter(s -> !s.isEmpty())
                     .map(number -> new Phone(null, number, savedClient.getId()))
