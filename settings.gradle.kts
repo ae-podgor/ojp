@@ -14,6 +14,7 @@ include("hw22-cache")
 include("hw24-webserver")
 include("hw25-di")
 include("hw28-springDataJdbc")
+include("hw31-executors")
 
 pluginManagement {
     val dependencyManagement: String by settings
