@@ -1,0 +1,44 @@
+﻿<!DOCTYPE html>
+<html lang="ru" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Клиенты</title>
+</head>
+<body>
+<h4>Создать нового клиента</h4>
+<form th:action="@{/clients/create}" method="post">
+    <input type="text" name="name" placeholder="Имя" required><br>
+    <input type="text" name="street" placeholder="Адрес"><br>
+    <input type="text" name="phones" placeholder="Номера телефона клиента"><br>
+    <small>Формат: +79991234567,+79991234568 (используйте запятую для разделения)</small><br>
+    <button type="submit">Создать</button>
+</form>
+<div th:if="${clientCreated}">
+    <pre>Создан клиент: <span th:text="${clientCreated}"></span></pre>
+</div>
+
+<h4>Список всех клиентов</h4>
+<table border="1">
+    <thead>
+    <tr>
+        <th>ID</th>
+        <th>Имя</th>
+        <th>Адрес</th>
+        <th>Телефоны</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr th:each="client : ${clients}">
+        <td th:text="${client.id}"></td>
+        <td th:text="${client.name}"></td>
+        <td th:text="${client.address != null ? client.address.street : ''}"></td>
+        <td>
+            <span th:each="phone, iterStat : ${client.phones}">
+                <span th:text="${phone.number}"></span><span th:if="${!iterStat.last}">, </span>
+            </span>
+        </td>
+    </tr>
+    </tbody>
+</table>
+</body>
+</html>

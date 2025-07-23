@@ -1,5 +1,6 @@
 package ru.otus.homework.service;
 
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import ru.otus.homework.base.AbstractHibernateTest;
@@ -11,6 +12,7 @@ import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+@Disabled("Включать с запущенным докером")
 @DisplayName("Демо работы с hibernate (с абстракциями) должно ")
 @SuppressWarnings("java:S125")
 class DbServiceClientTest extends AbstractHibernateTest {
