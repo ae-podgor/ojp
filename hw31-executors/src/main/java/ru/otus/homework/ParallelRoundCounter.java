@@ -3,8 +3,8 @@ package ru.otus.homework;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class PingPongCounter {
-    private static final Logger logger = LoggerFactory.getLogger(PingPongCounter.class);
+public class ParallelRoundCounter {
+    private static final Logger logger = LoggerFactory.getLogger(ParallelRoundCounter.class);
     private static final int MAX = 10;
     private static final int MIN = 1;
 
@@ -48,9 +48,9 @@ public class PingPongCounter {
     }
 
     public static void main(String[] args) {
-        PingPongCounter pingPongCounter = new PingPongCounter();
-        new Thread(() -> pingPongCounter.action("FIRST")).start();
-        new Thread(() -> pingPongCounter.action("SECOND")).start();
+        ParallelRoundCounter parallelRoundCounter = new ParallelRoundCounter();
+        new Thread(() -> parallelRoundCounter.action("FIRST")).start();
+        new Thread(() -> parallelRoundCounter.action("SECOND")).start();
     }
 
     private static void sleep() {
