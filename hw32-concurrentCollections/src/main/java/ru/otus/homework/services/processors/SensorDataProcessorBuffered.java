@@ -9,7 +9,8 @@ import ru.otus.homework.lib.SensorDataBufferedWriter;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
-import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.Queue;
+import java.util.concurrent.PriorityBlockingQueue;
 
 // Этот класс нужно реализовать
 @SuppressWarnings({"java:S1068", "java:S125"})
@@ -19,18 +20,19 @@ public class SensorDataProcessorBuffered implements SensorDataProcessor {
 
     private final int bufferSize;
     private final SensorDataBufferedWriter writer;
-    private final List<SensorData> dataBuffer = new CopyOnWriteArrayList<>();
+    private final Queue<SensorData> dataBuffer;
     private final Object lock = new Object();
 
     public SensorDataProcessorBuffered(int bufferSize, SensorDataBufferedWriter writer) {
         this.bufferSize = bufferSize;
         this.writer = writer;
+        this.dataBuffer = new PriorityBlockingQueue<>(bufferSize, Comparator.comparing(SensorData::getMeasurementTime));
     }
 
     @Override
     public void process(SensorData data) {
         synchronized (lock) {
-            dataBuffer.add(data);
+            dataBuffer.offer(data);
             if (dataBuffer.size() >= bufferSize) {
                 flush();
             }
