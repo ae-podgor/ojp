@@ -9,7 +9,6 @@ import ru.otus.homework.lib.SensorDataBufferedWriter;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
-import java.util.Queue;
 import java.util.concurrent.PriorityBlockingQueue;
 
 // Этот класс нужно реализовать
@@ -20,7 +19,7 @@ public class SensorDataProcessorBuffered implements SensorDataProcessor {
 
     private final int bufferSize;
     private final SensorDataBufferedWriter writer;
-    private final Queue<SensorData> dataBuffer;
+    private final PriorityBlockingQueue<SensorData> dataBuffer;
     private final Object lock = new Object();
 
     public SensorDataProcessorBuffered(int bufferSize, SensorDataBufferedWriter writer) {
@@ -40,21 +39,15 @@ public class SensorDataProcessorBuffered implements SensorDataProcessor {
     }
 
     public void flush() {
-        List<SensorData> bufferedData;
-        synchronized (lock) {
-            if (!dataBuffer.isEmpty()) {
-                bufferedData = new ArrayList<>(dataBuffer);
-                dataBuffer.clear();
-            } else {
-                return;
-            }
-        }
+        List<SensorData> bufferedData = new ArrayList<>();
+        dataBuffer.drainTo(bufferedData);
 
-        bufferedData.sort(Comparator.comparing(SensorData::getMeasurementTime));
-        try {
-            writer.writeBufferedData(bufferedData);
-        } catch (Exception e) {
-            log.error("Ошибка в процессе записи буфера", e);
+        if (!bufferedData.isEmpty()) {
+            try {
+                writer.writeBufferedData(bufferedData);
+            } catch (Exception e) {
+                log.error("Ошибка в процессе записи буфера", e);
+            }
         }
     }
 
