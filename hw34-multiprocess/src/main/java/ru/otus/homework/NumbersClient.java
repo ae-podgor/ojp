@@ -8,6 +8,7 @@ import org.slf4j.LoggerFactory;
 
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicInteger;
 
 public class NumbersClient {
 
@@ -15,7 +16,7 @@ public class NumbersClient {
     private static final int SERVER_PORT = 8190;
     private static final String SERVER_HOST = "localhost";
 
-    private static int lastServerValue = 0;
+    private static final AtomicInteger lastServerValue = new AtomicInteger(0);
     private static boolean isValueAdded = false;
 
     public static void main(String[] args) throws InterruptedException {
@@ -33,9 +34,9 @@ public class NumbersClient {
                 new StreamObserver<NumberResponse>() {
                     @Override
                     public void onNext(NumberResponse response) {
-                        lastServerValue = response.getValue();
+                        lastServerValue.set(response.getValue());  // Устанавливаем новое значение
                         isValueAdded = false;
-                        LOGGER.info("new value: '{}'", lastServerValue);
+                        LOGGER.info("new value: '{}'", lastServerValue.get());
                     }
 
                     @Override
@@ -54,7 +55,7 @@ public class NumbersClient {
         LOGGER.info("currentValue: '{}'", currentValue);
         for (int i = 0; i <= 50; i++) {
             if (!isValueAdded) {
-                currentValue += lastServerValue + 1;
+                currentValue += lastServerValue.get() + 1;  // Получаем текущее значение
                 isValueAdded = true;
             } else {
                 currentValue += 1;
