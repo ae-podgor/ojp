@@ -17,6 +17,9 @@ include("hw28-springDataJdbc")
 include("hw31-executors")
 include("hw32-concurrentCollections")
 include("hw34-multiprocess")
+include("hw38-webflux")
+include("hw38-webflux:client-service")
+include("hw38-webflux:datastore-service")
 
 pluginManagement {
     val dependencyManagement: String by settings
@@ -31,3 +34,4 @@ pluginManagement {
         id("com.google.protobuf") version protobufVer
     }
 }
+
