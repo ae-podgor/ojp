@@ -17,7 +17,6 @@ public class NumbersClient {
     private static final String SERVER_HOST = "localhost";
 
     private static final AtomicInteger lastServerValue = new AtomicInteger(0);
-    private static boolean isValueAdded = false;
 
     public static void main(String[] args) throws InterruptedException {
         ManagedChannel channel = ManagedChannelBuilder.forAddress(SERVER_HOST, SERVER_PORT)
@@ -35,7 +34,6 @@ public class NumbersClient {
                     @Override
                     public void onNext(NumberResponse response) {
                         lastServerValue.set(response.getValue());  // Устанавливаем новое значение
-                        isValueAdded = false;
                         LOGGER.info("new value: '{}'", lastServerValue.get());
                     }
 
@@ -54,12 +52,7 @@ public class NumbersClient {
 
         LOGGER.info("currentValue: '{}'", currentValue);
         for (int i = 0; i <= 50; i++) {
-            if (!isValueAdded) {
-                currentValue += lastServerValue.get() + 1;  // Получаем текущее значение
-                isValueAdded = true;
-            } else {
-                currentValue += 1;
-            }
+            currentValue += lastServerValue.getAndSet(0) + 1; // Получаем текущее значение
             LOGGER.info("currentValue: '{}'", currentValue);
 
             TimeUnit.MILLISECONDS.sleep(1000);
