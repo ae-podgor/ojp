@@ -20,6 +20,9 @@ include("hw34-multiprocess")
 include("hw38-webflux")
 include("hw38-webflux:client-service")
 include("hw38-webflux:datastore-service")
+include("realtime-order-analytics:producer")
+include("realtime-order-analytics:streams")
+
 
 pluginManagement {
     val dependencyManagement: String by settings
@@ -34,4 +37,3 @@ pluginManagement {
         id("com.google.protobuf") version protobufVer
     }
 }
-
