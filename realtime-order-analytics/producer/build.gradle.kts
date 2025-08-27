@@ -8,4 +8,8 @@ dependencies {
 
     implementation("org.projectlombok:lombok")
     annotationProcessor("org.projectlombok:lombok")
+
+    testImplementation ("org.testcontainers:kafka")
+    testImplementation ("org.junit.jupiter:junit-jupiter-engine")
+    testImplementation ("org.assertj:assertj-core")
 }
