@@ -1,8 +1,5 @@
 package ru.otus.homework.config;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.SerializationFeature;
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import org.apache.kafka.clients.producer.KafkaProducer;
 import org.apache.kafka.clients.producer.Producer;
 import org.apache.kafka.common.serialization.StringSerializer;
@@ -33,13 +30,6 @@ public class KafkaProducerConfig {
 
     @Value("${spring.kafka.bootstrap-servers:localhost:9092}")
     private String bootstrapServers;
-
-    @Bean
-    public ObjectMapper objectMapper() {
-        return new ObjectMapper()
-                .registerModule(new JavaTimeModule())
-                .disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
-    }
 
     @Bean
     public Producer<String, Order> kafkaProducer() {

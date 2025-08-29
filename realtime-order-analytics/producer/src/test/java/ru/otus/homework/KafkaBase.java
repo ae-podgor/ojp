@@ -16,18 +16,18 @@ import java.util.concurrent.TimeoutException;
 import static org.apache.kafka.clients.CommonClientConfigs.BOOTSTRAP_SERVERS_CONFIG;
 
 class KafkaBase {
+    private static final Logger log = LoggerFactory.getLogger(KafkaBase.class);
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(KafkaBase.class);
-    private static final KafkaContainer KAFKA_CONTAINER = new KafkaContainer("apache/kafka-native:3.9.1");
+    private static final KafkaContainer kafka = new KafkaContainer("apache/kafka-native:3.9.1");
     @Getter
     private static String bootstrapServers;
 
-    public static void start(Collection<NewTopic> topics) throws ExecutionException, InterruptedException,
-            TimeoutException {
-        KAFKA_CONTAINER.start();
-        bootstrapServers = KAFKA_CONTAINER.getBootstrapServers();
+    public static void start(Collection<NewTopic> topics)
+            throws ExecutionException, InterruptedException, TimeoutException {
+        kafka.start();
+        bootstrapServers = kafka.getBootstrapServers();
 
-        LOGGER.info("topics creation...");
+        log.info("topics creation...");
         try (var admin = AdminClient.create(Map.of(BOOTSTRAP_SERVERS_CONFIG, bootstrapServers))) {
             var result = admin.createTopics(topics);
 
@@ -35,6 +35,6 @@ class KafkaBase {
                 topicResult.get(10, TimeUnit.SECONDS);
             }
         }
-        LOGGER.info("topics created");
+        log.info("topics created");
     }
 }

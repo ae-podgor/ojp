@@ -9,6 +9,7 @@ import org.apache.kafka.common.serialization.StringDeserializer;
 import org.apache.kafka.common.serialization.StringSerializer;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
+import ru.otus.homework.config.JsonSerializer;
 import ru.otus.homework.model.Order;
 import ru.otus.homework.model.OrderStatus;
 import ru.otus.homework.service.ProducerService;
