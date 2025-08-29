@@ -1,0 +1,12 @@
+Получить инфо по скидке клиента
+curl --location --request GET 'http://localhost:8080/discount/user-666'
+
+Отправить order для клиента 666
+curl --location --request POST 'http://localhost:6666/custom' \
+--header 'Content-Type: application/json' \
+--data '{
+  "orderId": "02461d38-f0fd-4a65-a53f-e6fd32ce45re",
+  "userId": "user-666",
+  "status": "ACCEPTED"
+}
+'
