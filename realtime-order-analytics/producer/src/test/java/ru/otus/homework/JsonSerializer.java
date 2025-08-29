@@ -1,17 +1,14 @@
-package ru.otus.homework.config;
+package ru.otus.homework;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import lombok.RequiredArgsConstructor;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import org.apache.kafka.common.serialization.Serializer;
-import org.springframework.stereotype.Component;
 
 import java.util.Map;
 
-@Component
-@RequiredArgsConstructor
 public class JsonSerializer<T> implements Serializer<T> {
 
-    private final ObjectMapper mapper;
+    private final ObjectMapper mapper = new ObjectMapper().registerModule(new JavaTimeModule());
 
     @Override
     public void configure(Map<String, ?> configs, boolean isKey) {

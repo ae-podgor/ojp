@@ -48,15 +48,17 @@ public class TotalOrdersStream extends ContextualProcessor<String, Order, String
         String userId = record.key();
         Order order = record.value();
         Long current = store.get(userId);
-        if (current == null) current = 0L;
+        if (current == null) {
+            current = 0L;
+        }
 
-        current = switch (order.status()) {
+        Long updated  = switch (order.status()) {
             case ACCEPTED -> current + 1;
             case CANCELLED -> Math.max(0L, current - 1); // только в учебном проекте
         };
 
-        store.put(userId, current);
-        log.debug("Updated total orders amount for user '{}' -> '{}'", userId, current);
+        store.put(userId, updated);
+        log.info("Updated total orders amount for user '{}' -> '{}'", userId, updated);
     }
 
 }

@@ -22,7 +22,6 @@ public class OrderRestController {
 
     @PostMapping("/custom")
     public OrderRequest getDiscount(@RequestBody OrderRequest request) {
-        String orderId = UUID.randomUUID().toString();
         LocalDateTime eventTime = LocalDateTime.now();
         Order order = new Order(request.orderId, request.userId, eventTime, request.status);
         producerService.send(order);
